@@ -3,27 +3,42 @@
 internal class Forks
 {
     private readonly int _n;
-    private readonly SemaphoreSlim[] _forks;
+    private readonly Fork[] _forks;
+    private readonly SemaphoreSlim[] _locks;
 
     public Forks(int n)
     {
         _n = n;
-        _forks = new SemaphoreSlim[n];
+
+        _forks = new Fork[n];
+        for (var i = 0; i < _n; i++)
+        {
+            _forks[i] = new Fork(i);
+        }
+
+        _locks = new SemaphoreSlim[n];
         for(var i = 0; i < n; i++)
         {
-            _forks[i] = new SemaphoreSlim(1, 1);
+            _locks[i] = new SemaphoreSlim(1, 1);
         }
     }
 
     public void TakeFork(int philosopher, bool leftFork, CancellationToken ct)
     {
         var forkIndex = leftFork ? philosopher : (philosopher + 1) % _n;
-        _forks[forkIndex].Wait(ct);
+        _locks[forkIndex].Wait(ct);
+        _forks[forkIndex].Take(philosopher);
     }
 
     public void PutBackForks(int philosopher)
     {
-        _forks[philosopher].Release();
-        _forks[(philosopher + 1) % _n].Release();
+        this.PutBackFork(philosopher, philosopher);
+        this.PutBackFork(philosopher, (philosopher + 1) % _n);
+    }
+
+    public void PutBackFork(int philosopher, int fork)
+    {
+        _forks[fork].PutBack(philosopher);
+        _locks[fork].Release();
     }
 }
