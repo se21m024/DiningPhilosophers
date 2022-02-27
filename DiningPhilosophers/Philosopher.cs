@@ -1,4 +1,6 @@
-﻿namespace DiningPhilosophers;
+﻿using System.Diagnostics;
+
+namespace DiningPhilosophers;
 
 internal class Philosopher
 {
@@ -7,6 +9,15 @@ internal class Philosopher
     private readonly int _thinkingTime;
     private readonly int _eatingTime;
     private readonly CancellationToken _ct;
+
+    private const bool production = true;
+    private const int delayMs = 600;
+
+    private Stopwatch totalStopwatch = new Stopwatch();
+    private Stopwatch waitingStopwatch = new Stopwatch();
+
+    public long TotalTime => totalStopwatch.ElapsedMilliseconds;
+    public long WaitingTime => waitingStopwatch.ElapsedMilliseconds;
 
     public Philosopher(
         int index,
@@ -24,13 +35,33 @@ internal class Philosopher
 
     public void StartDinner()
     {
+        totalStopwatch.Start();
         try
         {
             while (!_ct.IsCancellationRequested)
             {
                 this.Think();
-                this.TakeFork(true);
-                this.TakeFork(false);
+                if (production)
+                {
+                    if (_index % 2 == 0)
+                    {
+                        this.TakeFork(true);
+                        Thread.Sleep(delayMs);
+                        this.TakeFork(false);
+                    }
+                    else
+                    {
+                        this.TakeFork(false);
+                        Thread.Sleep(delayMs);
+                        this.TakeFork(true);
+                    }
+                }
+                else
+                {
+                    this.TakeFork(true);
+                    Thread.Sleep(delayMs);
+                    this.TakeFork(false);
+                }
                 this.Eat();
                 this.PutBackForks();
             }
@@ -40,7 +71,8 @@ internal class Philosopher
         }
         finally
         {
-            Console.WriteLine($"P{_index} ends dinner.");
+            totalStopwatch.Stop();
+            Console.WriteLine($"P{_index} ends dinner. TotalTime:  {totalStopwatch.ElapsedMilliseconds}  WaitingTime: {waitingStopwatch.ElapsedMilliseconds}");
         }
     }
 
@@ -53,7 +85,9 @@ internal class Philosopher
     private void TakeFork(bool leftFork)
     {
         Console.WriteLine($"P{_index} waits for {(leftFork ? "left" : "right")} fork.");
+        waitingStopwatch.Start();
         _forks.TakeFork(_index, leftFork, _ct);
+        waitingStopwatch.Stop();
         Console.WriteLine($"P{_index} has taken {(leftFork ? "left" : "right")} fork.");
     }
 

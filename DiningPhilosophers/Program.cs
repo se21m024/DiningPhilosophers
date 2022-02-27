@@ -1,4 +1,5 @@
 ﻿using DiningPhilosophers;
+using System.Linq;
 
 try
 {
@@ -13,6 +14,8 @@ try
     Console.WriteLine("Eating time [ms]: ");
     var eatingTime = Convert.ToInt32(Console.ReadLine());
 
+    var philosophers = new Philosopher[n];
+
     var philosopherThreads = new Thread[n];
     var forks = new Forks(n);
 
@@ -20,8 +23,9 @@ try
 
     for (var i = 0; i < n; i++)
     {
-        var p = new Philosopher(i, forks, thinkingTime, eatingTime, cts.Token);
-        philosopherThreads[i] = new Thread(p.StartDinner);
+
+        philosophers[i] = new Philosopher(i, forks, thinkingTime, eatingTime, cts.Token);
+        philosopherThreads[i] = new Thread(philosophers[i].StartDinner);
         philosopherThreads[i].Start();
     }
 
@@ -35,8 +39,12 @@ try
         p.Join();
     }
 
+    Console.WriteLine($"TotalTime: {philosophers.Sum(x => x.TotalTime)}");
+    Console.WriteLine($"WaitingTime: {philosophers.Sum(x => x.WaitingTime)}");
+    Console.WriteLine($"Fraction: {Convert.ToDouble(philosophers.Sum(x => x.WaitingTime)) / philosophers.Sum(x => x.TotalTime)}");
     Console.WriteLine("Press RETURN to exit the program.");
     Console.ReadLine();
+
 }
 catch (Exception e)
 {
