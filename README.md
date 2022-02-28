@@ -6,9 +6,9 @@
 
 ## What are the necessary conditions for deadlocks (discussed in the lecture)?
 
-1. Mutual exculion
-2. Hold and wait
-3. No preemption
+1. Mutual Exclusion
+2. Hold and Wait
+3. No Preemption
 4. Circular Wait
    <br/>
    <br/>
@@ -52,12 +52,29 @@ The dead lock prevention logic can be switched on and off via the PreventDeadloc
 
 ## Does this strategy resolve the deadlock and why?
 
-The philosophers with an even index only take the left fork at first and philosophers with an uneven index take the right fork at first. This logic will prevent the "Curcular wait".
+The philosophers with an even index only take the left fork at first and philosophers with an uneven index take the right fork at first. This logic will prevent the "Circular Wait".
 
 This prevents that every philosopher takes only the left fork at once which would result in a "Hold and Wait".
 (Because every philosopher would try to take the right fork.
 The right fork would be in use by every philosopher as their left fork.)
 
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 <br/>
 <br/>
 
