@@ -1,4 +1,11 @@
-﻿try
+﻿// Dining Philosophers
+// .NET 6 console application.
+//
+// Authors:
+// Thomas Bründl
+// Thomas Stummer
+
+try
 {
     Console.WriteLine("Dining Philosophers\n" +
                       "Thomas Bründl\n" +
@@ -6,7 +13,7 @@
 
     Console.Write("Number of the philosophers: ");
     var n = Convert.ToInt32(Console.ReadLine());
-    Console.Write("Thinking time [ms}: ");
+    Console.Write("Thinking time [ms]: ");
     var thinkingTime = Convert.ToInt32(Console.ReadLine());
     Console.Write("Eating time [ms]: ");
     var eatingTime = Convert.ToInt32(Console.ReadLine());
@@ -54,37 +61,30 @@ catch (Exception e)
 
 internal class Fork
 {
-    private readonly int _index;
-    private int _takenByPhilosopher;
+    public int Index { get; }
+    public int TakenByPhilosopher { get; private set; }
 
     public Fork(int index)
     {
-        _index = index;
-        _takenByPhilosopher = -1;
+        this.Index = index;
+        this.TakenByPhilosopher = -1;
     }
 
     public void Take(int philosopher)
     {
-        if (_takenByPhilosopher > 0)
+        if (this.TakenByPhilosopher > 0)
         {
             throw new Exception(
-                $"Fork {_index} was already taken by p{_takenByPhilosopher} " +
+                $"Fork {Index} was already taken by p{this.TakenByPhilosopher} " +
                 $"when p{philosopher} tried to take it.");
         }
 
-        _takenByPhilosopher = philosopher;
+        this.TakenByPhilosopher = philosopher;
     }
 
-    public void PutBack(int philosopher)
+    public void PutBack()
     {
-        if (_takenByPhilosopher != philosopher)
-        {
-            throw new Exception(
-                $"Fork {_index} was already taken by p{_takenByPhilosopher} " +
-                $"when p{philosopher} tried to put it back.");
-        }
-
-        _takenByPhilosopher = -1;
+        this.TakenByPhilosopher = -1;
     }
 }
 
@@ -126,7 +126,12 @@ internal class Forks
 
     public void PutBackFork(int philosopher, int fork)
     {
-        _forks[fork].PutBack(philosopher);
+        if (_forks[fork].TakenByPhilosopher != philosopher)
+        {
+            return;
+        }
+
+        _forks[fork].PutBack();
         _locks[fork].Release();
     }
 }
@@ -200,7 +205,9 @@ internal class Philosopher
         finally
         {
             _totalStopwatch.Stop();
-            Console.WriteLine($"P{_index} ends dinner. TotalTime:  {_totalStopwatch.ElapsedMilliseconds}  WaitingTime: {_waitingStopwatch.ElapsedMilliseconds}");
+            Console.WriteLine($"P{_index} ends dinner. TotalTime: {_totalStopwatch.ElapsedMilliseconds} " +
+                              $"WaitingTime: {_waitingStopwatch.ElapsedMilliseconds}");
+            this.PutBackForks();
         }
     }
 

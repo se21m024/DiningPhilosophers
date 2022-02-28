@@ -1,4 +1,21 @@
-## What are the necessary conditions for deadlocks (discussed in the lecture) [0.5 points]?
+# Parallel Programming
+
+# Exercise 1, Concurrency - Dining Philosophers
+
+# Autors: Thomas Bründl, Thomas Stummer
+
+## What are the necessary conditions for deadlocks (discussed in the lecture)?
+
+1. Mutual exculion
+2. Hold and wait
+3. No preemption
+4. Curcular wait
+   <br/>
+   <br/>
+
+## Why does the initial solution lead to a deadlock (by looking at the deadlock conditions)
+
+Because all of the four deadlock conditions are met.
 
 1. Mutual exculion
 
@@ -15,45 +32,53 @@ It is not allowed to use resources (fork) that are in use by another thread.
 4. Curcular wait
 
 If every consumer takes the first resources (left fork) then every waits for the right resource (right lock).
+<br/>
+<br/>
 
-## Switch the order in which philosophers take the fork by using the following scheme: Odd philoso- phers start with the left fork, while even philosophers start with the right hand [6 points]. Make sure to use concurrency primitives correctly!
+## Switch the order in which philosophers take the fork by using the following scheme: Odd philosophers start with the left fork, while even philosophers start with the right hand. Make sure to use concurrency primitives correctly!
 
-Has been implemented via the production const in the Philosophers.cs file (see line 11).
+Has been implemented via the const PreventDeadlocks in the Philosophers.cs file.
+<br/>
+<br/>
 
-## Does this strategy resolve the deadlock and why [1 point]?
+## Does this strategy resolve the deadlock and why?
 
-The "Curcular wait" will be resolved. It can't ahppen that every philosoper takes only one fork (e.g If p1 takes the right fork p2 cannot pick the right fork).
+The "Circular wait" will be resolved. It can't ahppen that every philosoper takes only one fork (e.g If p1 takes the right fork p2 cannot pick the right fork).
+<br/>
+<br/>
 
-## Measure the total time spent in waiting for forks and compare it to the total runtime. Interpret the measurement - Was the result expected? [3 points].
+## Measure the total time spent in waiting for forks and compare it to the total runtime. Interpret the measurement - Was the result expected?
 
-Ab hier ich (Thomas S.) + alles in ein File
+The following times were measured without artificial sleeps (DelayMs = 0).
 
-5 Philosophers
-Thinkingtime: 100 ms
-Eatingtime: 99 ms
+Ab hier ich (Thomas S.)
 
-(Without sleep time)
+| Philosophers            | 10     | 10     | 100     | 100      |
+| ----------------------- | ------ | ------ | ------- | -------- |
+| Thinking time [ms]      | 100    | 100    | 100     | 100      |
+| Eating time [ms]        | 100    | 200    | 100     | 200      |
+| Total time [ms]         | 589812 | 910514 | 7046645 | 10059224 |
+| Total waiting time [ms] | 271809 | 420903 | 3241361 | 4656962  |
+| Relative waiting time   | 46,1 % | 46,2 % | 46,0 %  | 46,3 %   |
 
-Different input parameters do not affect the ratio of waitingTime and totalTime.
+**Conslusion:**<br/>
+Different parameters (ratio of thinking time to eating time or number of philosophers) do not affect the relative waiting time (waiting time compared to the overall time). From our side an impact on the relative waiting time when changing the program parameters was expected.
+<br/>
+<br/>
 
-ToDo.... Insert Table with data.
+## Can you think of other techniques for deadlock prevention?
 
-# Can you think of other techniques for deadlock prevention?
+- **Timeout for taking second fork**<br/>
+  If a philosopher holding the first fork was not waiting for the second fork eternally but returning the first fork and go into thinking mode after a configured timeout if he is not allowed to take the second fork, the hold and wait deadlock condition could be prevented. Another philosophers could than pick up the fork the other philosopher dropped.
 
-## Option 1
+- **Mediator**<br/>
+  A mediator that coordinates the access to the forks could be uses. The mediator assigns the forks pairwise to a philosopher. Therefore the hold and wait condition is avoided.
 
-Use a timeout for accessing forks. Provides other philosophers with the opportnety to access the fork during the on purpose timeout.
+- **Exclude particular philosopher**<br/>
+  Prevent all philosophers to access the forks at once. E.g. one philosopher must not access the forks while all other philosophers are allowed to access the forks any time. With this restriction the circular dependency constraint is bypassed.
+  <br/>
+  <br/>
 
-## Option 2
+## Make sure to always shutdown the program cooperatively and to always cleanup all allocated resources.
 
-Use mediator that coordinates the access to the forks. The mediator assigns the forks pairwise. When using a mediator the use of a hold and wait condition is not neccessary any more.
-
-## Option 3
-
-Prevent all philosophers to access the forks at once (e.g. One philosopher must not access the for while all other philosophers are allowed to access the forks.)
-
-# Make sure to always shutdown the program cooperatively and to always cleanup all allocated resources.
-
-<!-- A CancellationToken was used to ensure that the program can be gracefully shut down. When shutting down the program the philosophers have time to finish eating and putting back the forks or cancel the waiting if they are waiting for a fork. -->
-
-A CancellationToken was used to ensure that the program could be terminated properly. When the program shuts down, the philosophers have time to finish eating and reset the forks or cancel the wait if they are waiting for a fork.
+A cancellation token is passed to all philosopher threads. When the user wishes to terminate the program, the cancellation token is cancelled. If a philosopher was thinking or eating at the moment the token was cancelled, he finishes is current action. Afterwards he put down all forks he currently held. If a philosopher was waiting for one or more forks, the waiting was cancelled and he put down alls forks he currently held.
