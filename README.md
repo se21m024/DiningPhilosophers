@@ -9,41 +9,55 @@
 1. Mutual exculion
 2. Hold and wait
 3. No preemption
-4. Curcular wait
+4. Circular Wait
    <br/>
    <br/>
 
 ## Why does the initial solution lead to a deadlock (by looking at the deadlock conditions)
 
-Because all of the four deadlock conditions are met.
+Because all four deadlock conditions are met.
 
-1. Mutual exculion
+1. Mutual Exclusion
 
-Every fork is limited and can only be used by one pilosipher at once.
+Two or more resources are non-shareable.
+This means that every fork is limited and can only be used by one pilosipher at once.
 
 2. Hold and wait
 
-if the first fork is taken it is not taken until the second fork is taken.
+A process is holding at least one resource and waiting for resources.
+This means if a philosopher takes the first fork it will wait until it can take the second fork as well.
+If the second fork is taken indefinitely by another process the philosopher is blocked and it won't release the first fork.
 
-3. No preemption
+3. No Preemption
 
-It is not allowed to use resources (fork) that are in use by another thread.
+A resource cannot be taken from a process unless the process releases the resource.
+This means that it is not allowed to use a resource (fork) that is in use by an other philosopher (thread).
 
-4. Curcular wait
+4. Circular Wait
 
-If every consumer takes the first resources (left fork) then every waits for the right resource (right lock).
+A set of processes waits for each other in a circle.
+If each process takes the left fork first, it is not possible to take the right fork.
+This is because of the circular form of the philosophers.
+
 <br/>
 <br/>
 
 ## Switch the order in which philosophers take the fork by using the following scheme: Odd philosophers start with the left fork, while even philosophers start with the right hand. Make sure to use concurrency primitives correctly!
 
-Has been implemented via the const PreventDeadlocks in the Philosophers.cs file.
+This logic has been implemented in the Philosophers.cs.
+The dead lock prevention logic can be switched on and off via the PreventDeadlocks (see Philosophers.cs line 149 ) const.
+
 <br/>
 <br/>
 
 ## Does this strategy resolve the deadlock and why?
 
-The "Circular wait" will be resolved. It can't ahppen that every philosoper takes only one fork (e.g If p1 takes the right fork p2 cannot pick the right fork).
+The philosophers with an even index only take the left fork at first and philosophers with an uneven index take the right fork at first. This logic will prevent the "Curcular wait".
+
+This prevents that every philosopher takes only the left fork at once which would result in a "Hold and Wait".
+(Because every philosopher would try to take the right fork.
+The right fork would be in use by every philosopher as their left fork.)
+
 <br/>
 <br/>
 
