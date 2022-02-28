@@ -65,8 +65,6 @@ The right fork would be in use by every philosopher as their left fork.)
 
 The following times were measured without artificial sleeps (DelayMs = 0).
 
-Ab hier ich (Thomas S.)
-
 | Philosophers            | 10     | 10     | 100     | 100      |
 | ----------------------- | ------ | ------ | ------- | -------- |
 | Thinking time [ms]      | 100    | 100    | 100     | 100      |
