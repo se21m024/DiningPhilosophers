@@ -26,6 +26,8 @@ The "Curcular wait" will be resolved. It can't ahppen that every philosoper take
 
 ## Measure the total time spent in waiting for forks and compare it to the total runtime. Interpret the measurement - Was the result expected? [3 points].
 
+Ab hier ich (Thomas S.) + alles in ein File
+
 5 Philosophers
 Thinkingtime: 100 ms
 Eatingtime: 99 ms
